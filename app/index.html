@@ -1,0 +1,1177 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Neuroradiology Case Explorer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background-color: #f5f5f5;
+    }
+    .search-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      justify-content: center;
+    }
+    .search-bar input, select {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    .case {
+      background: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .case a {
+      color: blue;
+    }
+  </style>
+</head>
+<body>
+  <h1>Neuroradiology Case Explorer</h1>
+
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Search by title or tags">
+    <select id="modality-filter">
+      <option value="">All Modalities</option>
+      <option value="CT">CT</option>
+      <option value="CTA">CTA</option>
+      <option value="MRI">MRI</option>
+    </select>
+    <select id="tag-filter">
+      <option value="">All Tags</option>
+    </select>
+  </div>
+
+  <div id="case-list"></div>
+
+  <script>
+    // Sample case data hardcoded directly into the HTML for testing
+    const data = [
+  {
+    "title": "Case 1001 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "acute",
+      "cytotoxic edema",
+      "right pca",
+      "occipital"
+    ],
+    "link": "https://www.pacsbin.com/c/bkK-SuwkRj"
+  },
+  {
+    "title": "Case 1002 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "acute",
+      "ischemic stroke",
+      "aneurysm clip",
+      "subarachnoid  hemorrhage",
+      "intraventricular hemorrhage",
+      "intraventricular drain",
+      "artery of huebner"
+    ],
+    "link": "https://www.pacsbin.com/c/ZJl8Y0OkRj"
+  },
+  {
+    "title": "Case 1003 CT BRAIN STROKE WO CONTRAST",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "acute",
+      "ischemic stroke",
+      "hyperdense mca sign",
+      "loss of the insular ribbon",
+      "basal ganglia"
+    ],
+    "link": "https://www.pacsbin.com/c/W1wzYROyCs"
+  },
+  {
+    "title": "Case 1004 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "acute",
+      "ischemic stroke",
+      "hyperdense mca sign",
+      "loss of the insular ribbon",
+      "cytotoxic edema",
+      "basal ganglia"
+    ],
+    "link": "https://www.pacsbin.com/c/-1hvOC_yAs"
+  },
+  {
+    "title": "Case 1005 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "dilatation fourth ventricle",
+      "entrapped fourth ventricle",
+      "shunted ventricles",
+      "intraventricular drain",
+      "hydrocephalus"
+    ],
+    "link": "https://www.pacsbin.com/c/Wyo5DRukAi"
+  },
+  {
+    "title": "Case 1006 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "epidural hematoma",
+      "calvarial fracture",
+      "subarachnoid  hemorrhage"
+    ],
+    "link": "https://www.pacsbin.com/c/WJGOwROJCi"
+  },
+  {
+    "title": "Case 1007 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "chiari ii",
+      "ventricular calcification"
+    ],
+    "link": "https://www.pacsbin.com/c/ZJ3jUCO1Ci"
+  },
+  {
+    "title": "Case 1008 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "penetrating injury",
+      "cerebral parenchymal contusion",
+      "subarachnoid  hemorrhage",
+      "intraventricular hemorrhage"
+    ],
+    "link": "https://www.pacsbin.com/c/ZkeX8CuJAs"
+  },
+  {
+    "title": "Case 1009 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "third ventricular colloid cyst",
+      "dilatation lateral ventricle",
+      "colloid cyst",
+      "obstructive hydrocephalus"
+    ],
+    "link": "https://www.pacsbin.com/c/WkiSrRdkRj"
+  },
+  {
+    "title": "Case 1010 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "diffuse cerebral edema",
+      "anoxic brain injury",
+      "downward transtentorial herniation",
+      "subarachnoid  hemorrhage"
+    ],
+    "link": "https://www.pacsbin.com/c/-JRMrCdy0j"
+  },
+  {
+    "title": "Case 1011 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "sunken flap",
+      "craniectomy"
+    ],
+    "link": "https://www.pacsbin.com/c/bJxYNCukAs"
+  },
+  {
+    "title": "Case 1012 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "mixed density subdural collection",
+      "intraventricular",
+      "uncal herniation"
+    ],
+    "link": "https://www.pacsbin.com/c/W1pWN0_kRs"
+  },
+  {
+    "title": "Case 1013 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "dilatation lateral ventricle",
+      "mixed density mass",
+      "calcified mass",
+      "tuberous sclerosis",
+      "subependymal giant cell astrocytoma (sega)",
+      "subependymal nodule",
+      "obstructive hydrocephalus"
+    ],
+    "link": "https://www.pacsbin.com/c/WyDLm0OJ0o"
+  },
+  {
+    "title": "Case 1014 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "dilatation fourth ventricle",
+      "entrapped fourth ventricle",
+      "shunted ventricles",
+      "periventricular leukomalacia"
+    ],
+    "link": "https://www.pacsbin.com/c/b129fRuJAj"
+  },
+  {
+    "title": "Case 1015 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "subarachnoid hemorrhage",
+      "intraventricular hemorrhage",
+      "acute subdural hemorrhage",
+      "obstructive hydrocephalus",
+      "shear injury"
+    ],
+    "link": "https://www.pacsbin.com/c/ZJymMAuJAs"
+  },
+  {
+    "title": "Case 1016 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "arachnoid cyst",
+      "supravermian",
+      "pineal"
+    ],
+    "link": "https://www.pacsbin.com/c/Z17DZ0u1Ro"
+  },
+  {
+    "title": "Case 1017 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "subarachnoid  hemorrhage",
+      "sutural diastasis"
+    ],
+    "link": "https://www.pacsbin.com/c/b11sxRdJRo"
+  },
+  {
+    "title": "Case 1018 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "slit ventricles",
+      "shunted ventricles"
+    ],
+    "link": "https://www.pacsbin.com/c/b11sxRdJRo"
+  },
+  {
+    "title": "Case 1019 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "diffuse cerebral edema",
+      "intracranial hemorrhage"
+    ],
+    "link": "https://www.pacsbin.com/c/b1j0yRuJ0o"
+  },
+  {
+    "title": "Case 1020 CT BRAIN STROKE WO CONTRAST",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "acute",
+      "ischemic stroke",
+      "hyperdense mca sign",
+      "basal ganglia"
+    ],
+    "link": "https://www.pacsbin.com/c/bJ8nkRuJAo"
+  },
+  {
+    "title": "Case 1021 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "hydranencephaly"
+    ],
+    "link": "https://www.pacsbin.com/c/ZkSJC6dyAo"
+  },
+  {
+    "title": "Case 1022 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "pineal",
+      "mixed density mass",
+      "dilatation lateral ventricle",
+      "dilatation third ventricle",
+      "obstructive hydrocephalus"
+    ],
+    "link": "https://www.pacsbin.com/c/-kJKT6ukRj"
+  },
+  {
+    "title": "Case 1023 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "lateral ventricular mass",
+      "dilatation lateral ventricle",
+      "dilatation third ventricle",
+      "metastasis rcc",
+      "renal cell carcinoma (rcc)",
+      "hydrocephalus"
+    ],
+    "link": "https://www.pacsbin.com/c/bJwIp6_J0o"
+  },
+  {
+    "title": "Case 1024 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "colloid cyst",
+      "third ventricle",
+      "dilatation lateral ventricle",
+      "hydrocephalus"
+    ],
+    "link": "https://www.pacsbin.com/c/WJpF2adkAj"
+  },
+  {
+    "title": "Case 1025 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "midline shift",
+      "epidural hematoma",
+      "calvarial fracture"
+    ],
+    "link": "https://www.pacsbin.com/c/WJWw3a_1Rj"
+  },
+  {
+    "title": "Case 1026 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "penetrating injury",
+      "calvarial fracture",
+      "pneumocephalus",
+      "cerebral parenchymal laceration"
+    ],
+    "link": "https://www.pacsbin.com/c/-J9RipuJCj"
+  },
+  {
+    "title": "Case 1027 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "arachnoid cyst",
+      "subdural hematoma",
+      "bone remodeling",
+      "moderate complexity case",
+      "subacute subdural hematoma"
+    ],
+    "link": "https://www.pacsbin.com/c/ZJorsa_yRj"
+  },
+  {
+    "title": "Case 1028 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "brain mass",
+      "diffuse large b cell lymphoma.",
+      "obstuctive hydrocephalus",
+      "dilatation lateral ventricle",
+      "entrapped temporal horn"
+    ],
+    "link": "https://www.pacsbin.com/c/WJQ05auk0o"
+  },
+  {
+    "title": "Case 1029 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "subacute",
+      "ischemic stroke",
+      "hemorrhagic conversion",
+      "midline shift",
+      "vasogenic edema",
+      "basal ganglia"
+    ],
+    "link": "https://www.pacsbin.com/c/ZJjBc6uJRj"
+  },
+  {
+    "title": "Case 1030 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "mixed density subdural collection",
+      "midline shift",
+      "ventricular effacement",
+      "subfalcine herniation",
+      "uncal herniation"
+    ],
+    "link": "https://www.pacsbin.com/c/Zko6tT_JRj"
+  },
+  {
+    "title": "Case 1031 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "acute subdural hemorrhage",
+      "subarachnoid  hemorrhage",
+      "comminuted,  open,  depressed  right  frontal  skull  fracture with isodense epidural blood, likely hyperacute. laceration  of  the  right  frontal  lobe  with  resulting  intraparenchymal and subarachnoid hemorrhage.",
+      "gunshot injury",
+      "calvarial fracture"
+    ],
+    "link": "https://www.pacsbin.com/c/-y6BF6dkRs"
+  },
+  {
+    "title": "Case 1032 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "calvarial fracture",
+      "temporal bone fracture"
+    ],
+    "link": "https://www.pacsbin.com/c/bks2uTd10s"
+  },
+  {
+    "title": "Case 1033 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "epidural hematoma",
+      "calvarial fracture"
+    ],
+    "link": "https://www.pacsbin.com/c/WkJSOpuyRo"
+  },
+  {
+    "title": "Case 1034 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "agenesis of the corpus callosum",
+      "colpocephaly"
+    ],
+    "link": "https://www.pacsbin.com/c/-J2tvau1Co"
+  },
+  {
+    "title": "Case 1035 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "watershed territory infarct",
+      "cerebral parenchymal contusion",
+      "facial smash injury"
+    ],
+    "link": "https://www.pacsbin.com/c/ZkcCIp_kAi"
+  },
+  {
+    "title": "Case 1036 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "diffuse cerebral edema",
+      "subarachnoid hemorrhage",
+      "facial smash injury"
+    ],
+    "link": "https://www.pacsbin.com/c/WJ-z8TOkRi"
+  },
+  {
+    "title": "Case 1037 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "diffuse cerebral edema",
+      "downward transtentorial herniation",
+      "subarachnoid hemorrhage",
+      "intraventricular hemorrhage",
+      "acute subdural hemorrhage"
+    ],
+    "link": "https://www.pacsbin.com/c/Zku3HT_10o"
+  },
+  {
+    "title": "Case 1038 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "chiari decompression",
+      "intracranial hypotension",
+      "sagging brain",
+      "chiari 1 malformation"
+    ],
+    "link": ""
+  },
+  {
+    "title": "Case 1039 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "intraventricular hemorrhage",
+      "lateral ventricular hemorrhage",
+      "third ventricular hemorrhage",
+      "fourth ventricular hemorrhage",
+      "communicating hydrocephalus",
+      "parenchymal hematoma",
+      "pons",
+      "thalamus",
+      "hypertensive intracerebral hemorrhage"
+    ],
+    "link": "https://www.pacsbin.com/c/-1LISpOJAj"
+  },
+  {
+    "title": "Case 1040 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "anoxic brain injury",
+      "diffuse cerebral edema",
+      "downward transtentorial herniation",
+      "tonsillar herniation",
+      "fat embolization",
+      "subarachnoid hemorrhage",
+      "intraventricular hemorrhage",
+      "calvarial fracture"
+    ],
+    "link": "https://www.pacsbin.com/c/bkSeBad10j"
+  },
+  {
+    "title": "Case 1041 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "entrapped fourth ventricle",
+      "subdural hematoma",
+      "subarachnoid hemorrhage",
+      "intraventricular hemorrhage",
+      "intraventricular drain"
+    ],
+    "link": "https://www.pacsbin.com/c/-J7VEpd1Ai"
+  },
+  {
+    "title": "Case 1042 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "communicating hydrocephalus",
+      "dilatation lateral ventricle",
+      "dilatation third ventricle",
+      "shunted ventricles",
+      "shunt malfunction",
+      "transependymal flow"
+    ],
+    "link": "https://www.pacsbin.com/c/bk9Am6uk0i"
+  },
+  {
+    "title": "Case 1043 BRAIN WO CONTRAST CT",
+    "modality": "CT",
+    "tags": [
+      "ct",
+      "brain",
+      "epidural hematoma",
+      "calvarial fracture",
+      "subarachnoid hemorrhage",
+      "durett hemorrhage",
+      "cerebral parenchymal contusion"
+    ],
+    "link": "https://www.pacsbin.com/c/ZJm6-6uJCs"
+  },
+  {
+    "title": "Case 1044 BRAIN/NECK CTA",
+    "modality": "CT",
+    "tags": [
+      "cta",
+      "brain",
+      "neck",
+      "subarachnoid  hemorrhage",
+      "moya moya disease"
+    ],
+    "link": "https://www.pacsbin.com/c/WkcVZTOy0i"
+  },
+  {
+    "title": "Case 1045 NECK CTA",
+    "modality": "CT",
+    "tags": [
+      "cta",
+      "neck",
+      "pseudoaneurysm",
+      "facial fracture",
+      "nasopharyngeal mass",
+      "incidental",
+      "retropharyngeal lymphadenopaty"
+    ],
+    "link": "https://www.pacsbin.com/c/ZyIagTdJ0i"
+  },
+  {
+    "title": "Case 1046 CTA BRAIN/NECK STROKE PERFUSION",
+    "modality": "CT",
+    "tags": [
+      "cta",
+      "brain",
+      "neck",
+      "perfusion abnormality",
+      "seizure activity",
+      "luxury perfusion"
+    ],
+    "link": "https://www.pacsbin.com/c/ZyEQgTuJ0j"
+  },
+  {
+    "title": "Case 1047 BRAIN/NECK CTA",
+    "modality": "CT",
+    "tags": [
+      "cta",
+      "neck",
+      "brain",
+      "epidural hematoma",
+      "calvarial fracture",
+      "subdural hematoma"
+    ],
+    "link": "https://www.pacsbin.com/c/b1Gsy6dJAj"
+  },
+  {
+    "title": "Case 1048 CHEST CTA",
+    "modality": "CT",
+    "tags": [
+      "cta",
+      "chest",
+      "ischemic stroke",
+      "atherosclerosis",
+      "thrombus",
+      "soft plaque"
+    ],
+    "link": "https://www.pacsbin.com/c/ZJQ71pOJCs"
+  },
+  {
+    "title": "Case 1049 CTA BRAIN/NECK STROKE PERFUSION",
+    "modality": "CT",
+    "tags": [
+      "cta"
+    ],
+    "link": "https://www.pacsbin.com/c/bk-4C2ukCi"
+  },
+  {
+    "title": "Case 1050 CTA BRAIN/NECK STROKE PERFUSION",
+    "modality": "CT",
+    "tags": [
+      "cta",
+      "brain",
+      "neck",
+      "ischemic stroke",
+      "acute",
+      "internal carotid artery",
+      "occlusion",
+      "dissection",
+      "fetal origin of the posterior cerebral artery",
+      "persistent primitive trigeminal artery",
+      "perfusion abnormality"
+    ],
+    "link": "https://www.pacsbin.com/c/-kryA2d1Aj"
+  },
+  {
+    "title": "Case 1051 CTA BRAIN/NECK STROKE PERFUSION",
+    "modality": "CT",
+    "tags": [
+      "cta",
+      "brain",
+      "neck",
+      "ischemic stroke",
+      "occlusion",
+      "middle cerebral artery",
+      "collateralization",
+      "acute",
+      "intracranial atherosclerosis",
+      "posterior cerebral artery",
+      "high-grade stenosis",
+      "chronic subdural hematoma"
+    ],
+    "link": "https://www.pacsbin.com/c/ZkVPa2ukRj"
+  },
+  {
+    "title": "Case 1052 NECK CTA",
+    "modality": "CT",
+    "tags": [
+      "cta",
+      "neck",
+      "epidural hematoma",
+      "calvarial fracture"
+    ],
+    "link": "https://www.pacsbin.com/c/Z1gy62_k0s"
+  },
+  {
+    "title": "Case 1053 CTA BRAIN/NECK STROKE PERFUSION",
+    "modality": "CT",
+    "tags": [
+      "cta",
+      "brain",
+      "neck",
+      "acute",
+      "ischemic stroke",
+      "atherosclerosis",
+      "ruptured atherosclerotic plaque",
+      "carotid artery stenosis",
+      "perfusion abnormality",
+      "middle cerebral artery"
+    ],
+    "link": "https://www.pacsbin.com/c/WJyOn3d10i"
+  },
+  {
+    "title": "Case 2001 BRAIN WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "anoxic brain injury",
+      "mass effect",
+      "basal cistern effacement",
+      "diffusion restriction"
+    ],
+    "link": "https://www.pacsbin.com/c/-JD6Ho_y0i"
+  },
+  {
+    "title": "Case 2002 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/W1WC9nuk0j"
+  },
+  {
+    "title": "Case 2003 BRAIN WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "anoxic brain injury",
+      "subacute"
+    ],
+    "link": "https://www.pacsbin.com/c/WyXLqn_yRo"
+  },
+  {
+    "title": "Case 2004 SPINE CERVICAL W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "spinal cord",
+      "syringomyelia"
+    ],
+    "link": "https://www.pacsbin.com/c/bynRK3dy0i"
+  },
+  {
+    "title": "Case 2005 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/bkzBK3OyRi"
+  },
+  {
+    "title": "Case 2006 BRAIN WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "hypoxic ischemic injury",
+      "thalamus",
+      "hippocampus",
+      "diffusion restriction"
+    ],
+    "link": "https://www.pacsbin.com/c/WJUadn_J0i"
+  },
+  {
+    "title": "Case 2007 BRAIN WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "ischemic stroke",
+      "acute",
+      "middle cerebal artery"
+    ],
+    "link": "https://www.pacsbin.com/c/-1u4_hdk0j"
+  },
+  {
+    "title": "Case 2008 BRAIN W CONTRAST MRI STEALTH",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/W1nnwhd1Cs"
+  },
+  {
+    "title": "Case 2009 SPINE CERVICAL W CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "spine",
+      "acute",
+      "carotid artery dissection"
+    ],
+    "link": "https://www.pacsbin.com/c/W1cAI3u1Cs"
+  },
+  {
+    "title": "Case 2010 SPINE CERVICAL W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "spine",
+      "acute",
+      "ischemic stroke"
+    ],
+    "link": "https://www.pacsbin.com/c/-yy28h_y0i"
+  },
+  {
+    "title": "Case 2011 BRAIN WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "acute",
+      "intracranial hemorrhage",
+      "intraventricular",
+      "periventricular",
+      "intraparenchymal",
+      "obstructive hydrocephalus"
+    ],
+    "link": "https://www.pacsbin.com/c/Zkh78h_y0j"
+  },
+  {
+    "title": "Case 2012 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "brain mass",
+      "atypical meningioma"
+    ],
+    "link": "https://www.pacsbin.com/c/WJTKH2dkCs"
+  },
+  {
+    "title": "Case 2013 BRAIN WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/bkSGHn_J0j"
+  },
+  {
+    "title": "Case 2014 BRAIN WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "ischemic stroke",
+      "acute",
+      "subacute",
+      "thrombus",
+      "occlusion",
+      "thrombus",
+      "watershed territory infarct"
+    ],
+    "link": "https://www.pacsbin.com/c/W1cv4hO1Ri"
+  },
+  {
+    "title": "Case 2015 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "glioblastoma",
+      "brain mass"
+    ],
+    "link": "https://www.pacsbin.com/c/bytAmhOkAj"
+  },
+  {
+    "title": "Case 2016 SPINE ENTIRE W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/byMH7hdk0o"
+  },
+  {
+    "title": "Case 2017 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/-kU5zhu10i"
+  },
+  {
+    "title": "Case 2018 BRAIN W CONTRAST MRI STEALTH",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "brain mass",
+      "cerebral venous sinus invasion"
+    ],
+    "link": "https://www.pacsbin.com/c/b1uMfnd1Ri"
+  },
+  {
+    "title": "Case 2019 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/bJ9x-huyRj"
+  },
+  {
+    "title": "Case 2020 BRAIN WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "ischemic stroke",
+      "acute"
+    ],
+    "link": "https://www.pacsbin.com/c/-1pIlh_JAo"
+  },
+  {
+    "title": "Case 2021 BRAIN WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "anoxic brain injury",
+      "downward transtentorial herniation",
+      "diffusion restriction"
+    ],
+    "link": "https://www.pacsbin.com/c/bygpkhdJCj"
+  },
+  {
+    "title": "Case 2022 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "cerebral venous thrombosis",
+      "cerebral venous sinus",
+      "vasogenic edema",
+      "subdural hematoma",
+      "tentorial subdural hematoma"
+    ],
+    "link": "https://www.pacsbin.com/c/Z1nPTjOJAs"
+  },
+  {
+    "title": "Case 2023 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "ischemic stroke",
+      "brain stem",
+      "vertebral artery",
+      "mural thrombus",
+      "anterior choroidal artery",
+      "acute"
+    ],
+    "link": "https://www.pacsbin.com/c/-JgKhi_y0j"
+  },
+  {
+    "title": "Case 2024 SPINE THORACIC W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "spine",
+      "spinal cord",
+      "ischemic stroke"
+    ],
+    "link": "https://www.pacsbin.com/c/Z1CS2s_kCs"
+  },
+  {
+    "title": "Case 2025 INTERNAL AUDITORY CANAL W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/-kmjoidJAs"
+  },
+  {
+    "title": "Case 2026 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "brain mass",
+      "meningioma"
+    ],
+    "link": "https://www.pacsbin.com/c/byjwio_1Rj"
+  },
+  {
+    "title": "Case 2027 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/bk2yojOJAs"
+  },
+  {
+    "title": "Case 2028 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "developmental venous anomaly",
+      "thrombus",
+      "chronic",
+      "venous infarct",
+      "tuberous sclerosis",
+      "subependymal nodules"
+    ],
+    "link": "https://www.pacsbin.com/c/bkJv5idJAi"
+  },
+  {
+    "title": "Case 2029 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri",
+      "brain",
+      "acute",
+      "subacute",
+      "venous infarct",
+      "diffusion restriction",
+      "leptomeningeal enhancement",
+      "cerebral venous sinus"
+    ],
+    "link": "https://www.pacsbin.com/c/bylVk5jO1Ro"
+  },
+  {
+    "title": "Case 2030 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/bybEYi_J0i"
+  },
+  {
+    "title": "Case 2031 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/-k2quoOJRj"
+  },
+  {
+    "title": "Case 2032 BRAIN W-WO CONTRAST MRI",
+    "modality": "MRI",
+    "tags": [
+      "mri"
+    ],
+    "link": "https://www.pacsbin.com/c/WJ_dkoO1Co"
+  },
+  {
+    "title": "Case Pacs bin number Study Type",
+    "modality": "MODALITY",
+    "tags": [
+      "tags (each tag is in a separate cell starting from this column)"
+    ],
+    "link": ""
+  }
+];
+
+    const searchInput = document.getElementById("search-input");
+    const modalityFilter = document.getElementById("modality-filter");
+    const tagFilter = document.getElementById("tag-filter");
+    const caseList = document.getElementById("case-list");
+
+    let cases = data;
+
+    function populateTagFilter(cases) {
+      const tags = new Set();
+      cases.forEach(c => c.tags.forEach(tag => tags.add(tag)));
+      const sorted = Array.from(tags).sort();
+      for (const tag of sorted) {
+        const opt = document.createElement("option");
+        opt.value = tag;
+        opt.textContent = tag;
+        tagFilter.appendChild(opt);
+      }
+    }
+
+    function displayCases(filteredCases) {
+      caseList.innerHTML = "";
+      filteredCases.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "case";
+        div.innerHTML = `
+          <strong>${c.title}</strong><br>
+          <em>Modality:</em> ${c.modality}<br>
+          <em>Tags:</em> ${c.tags.join(", ")}<br>
+          <a href="${c.link}" target="_blank">${c.link ? "View Case" : "No Link Available"}</a>
+        `;
+        caseList.appendChild(div);
+      });
+    }
+
+    function filterCases() {
+      const query = searchInput.value.toLowerCase();
+      const selectedModality = modalityFilter.value;
+      const selectedTag = tagFilter.value;
+
+      const result = cases.filter(c => {
+        const matchesQuery =
+          c.title.toLowerCase().includes(query) ||
+          c.tags.some(tag => tag.includes(query));
+        const matchesModality = !selectedModality || c.modality === selectedModality;
+        const matchesTag = !selectedTag || c.tags.includes(selectedTag);
+        return matchesQuery && matchesModality && matchesTag;
+      });
+
+      displayCases(result);
+    }
+
+    // Initialize the interface
+    populateTagFilter(cases);
+    displayCases(cases);
+
+    searchInput.addEventListener("input", filterCases);
+    modalityFilter.addEventListener("change", filterCases);
+    tagFilter.addEventListener("change", filterCases);
+  </script>
+</body>
+</html>
