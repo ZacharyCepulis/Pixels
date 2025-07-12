@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Neuroradiology Case Explorer</title>
+  <style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 2rem;
+    background-color: #0a0a0a; /* deep black */
+    color: #e0fefe; /* light teal text */
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 4rem;
+    color: #00ffd5;
+
+  }
+
+  .search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+    background: radial-gradient(circle at center, #022221 0%, #010a0a 100%);
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #00ffd5;
+  }
+
+  .search-bar input,
+  .search-bar select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    background-color: #011;
+    color: #00ffd5;
+    border: 1px solid #00ffd5;
+    border-radius: 5px;
+    box-shadow: 0 0 8px #00ffd5;
+  }
+
+  .case {
+    background: linear-gradient(145deg, #021212, #000000);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 213, 0.3);
+    border: 1px solid #00ffd5;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .case:hover {
+    transform: scale(1.002);
+    box-shadow: 0 0 25px #00ffd5;
+  }
+
+  .case a {
+    color: #00ffd5;
+    text-decoration: none;
+    font-weight: bold;
+    text-shadow: 0 0 1px #00ffd5;
+  }
+
+  em {
+    color: #75cbbf;
+    font-style: normal;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+  <h1>Neuroradiology Case Explorer</h1>
+
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Search by title or tags">
+    <select id="modality-filter">
+      <option value="">All Modalities</option>
+      <option value="CT">CT</option>
+      <option value="CTA">CTA</option>
+      <option value="MRI">MRI</option>
+    </select>
+    <select id="tag-filter">
+      <option value="">All Tags</option>
+    </select>
+  </div>
+
+  <div id="case-list"></div>
+
+<script>
+  let cases = [];
+
+  // Load data from cases.json
+  fetch("cases.json")
+    .then(response => response.json())
+    .then(data => {
+      cases = data;
+      populateTagFilter(cases);
+      displayCases(cases);
+    });
+
+  const searchInput = document.getElementById("search-input");
+  const modalityFilter = document.getElementById("modality-filter");
+  const tagFilter = document.getElementById("tag-filter");
+  const caseList = document.getElementById("case-list");
+
+  function populateTagFilter(cases) {
+    const tags = new Set();
+    cases.forEach(c => c.tags.forEach(tag => tags.add(tag)));
+    const sorted = Array.from(tags).sort();
+    for (const tag of sorted) {
+      const opt = document.createElement("option");
+      opt.value = tag;
+      opt.textContent = tag;
+      tagFilter.appendChild(opt);
+    }
+  }
+
+  function displayCases(filteredCases) {
+    caseList.innerHTML = "";
+    filteredCases.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "case";
+      div.innerHTML = `
+        <strong>${c.title}</strong><br>
+        <em>Modality:</em> ${c.modality}<br>
+        <em>Tags:</em> ${c.tags.join(", ")}<br>
+        <a href="${c.link}" target="_blank">${c.link ? "View Case" : "No Link Available"}</a>
+      `;
+      caseList.appendChild(div);
+    });
+  }
+
+  function filterCases() {
+    const query = searchInput.value.toLowerCase();
+    const selectedModality = modalityFilter.value;
+    const selectedTag = tagFilter.value;
+
+    const result = cases.filter(c => {
+      const matchesQuery =
+        c.title.toLowerCase().includes(query) ||
+        c.tags.some(tag => tag.includes(query));
+      const matchesModality = !selectedModality || c.modality === selectedModality;
+      const matchesTag = !selectedTag || c.tags.includes(selectedTag);
+      return matchesQuery && matchesModality && matchesTag;
+    });
+
+    displayCases(result);
+  }
+
+  searchInput.addEventListener("input", filterCases);
+  modalityFilter.addEventListener("change", filterCases);
+  tagFilter.addEventListener("change", filterCases);
+</script>
+</body>
+</html>
