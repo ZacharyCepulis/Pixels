@@ -1,157 +1,222 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Neuroradiology Case Explorer</title>
+  <meta charset="UTF-8" />
+  <title>P2P - Neuroradiology Case Explorer</title>
+  <base href="https://pixels2patterns.com/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="P2P" />
+  <meta name="keywords" content="P2P" />
+  <link rel="canonical" href="https://pixels2patterns.com/" />
+  <meta name="generator" content="Website Builder" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="P2P" />
+  <meta property="og:description" content="P2P" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pixels2patterns.com/" />
+
+  <!-- Styles and scripts -->
+  <link href="css/common-bundle.css?ts=20250714212803" rel="stylesheet" type="text/css" />
+  <link href="css/a188dd93abf3000433fb38f365731ff4-bundle.css?ts=20250714212803" rel="stylesheet" type="text/css" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin,latin-ext,vietnamese" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin,latin-ext,vietnamese" rel="stylesheet" />
+  <script src="js/common-bundle.js?ts=20250714212803" type="text/javascript"></script>
+  <script src="js/a188dd93abf3000433fb38f365731ff4-bundle.js?ts=20250714212803" type="text/javascript"></script>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="logo/favicon2.jpg" />
+  <!-- (Omitting repeated icon sizes for brevity) -->
+
+  <script>
+    window.useTrailingSlashes = true;
+    window.disableRightClick = false;
+    window.currLang = 'en';
+  </script>
+
   <style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 2rem;
-    background-color: #0a0a0a; /* deep black */
-    color: #e0fefe; /* light teal text */
-  }
+    /* Custom Neuroradiology Styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f0f0f;
+      color: #e0fefe;
+    }
 
-  h1 {
-    text-align: center;
-    font-size: 4rem;
-    color: #00ffd5;
+    h1 {
+      text-align: center;
+      font-size: 4rem;
+      color: #a2f9f1;
+      margin-top: 2rem;
+    }
 
-  }
+    .search-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 2rem auto;
+      justify-content: left;
+      background: radial-gradient(circle at center, #0f0f0f 0%, #0f0f0f 100%);
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 0 5px #a2f9f1;
+      max-width: 600px;
+    }
 
-  .search-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    justify-content: center;
-    background: radial-gradient(circle at center, #022221 0%, #010a0a 100%);
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 0 15px #00ffd5;
-  }
+    .search-bar input,
+    .search-bar select {
+      padding: 0.5rem;
+      font-size: 1.2rem;
+      background-color: #011;
+      color: #a2f9f1;
+      border: 1px solid #a2f9f1;
+      border-radius: 12px;
+      box-shadow: 0 0 5px #a2f9f1;
+      max-width: 300px;
+    }
 
-  .search-bar input,
-  .search-bar select {
-    padding: 0.5rem;
-    font-size: 1rem;
-    background-color: #011;
-    color: #00ffd5;
-    border: 1px solid #00ffd5;
-    border-radius: 5px;
-    box-shadow: 0 0 8px #00ffd5;
-  }
+    #case-list {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1rem;
+      justify-content: left;
+    }
 
-  .case {
-    background: linear-gradient(145deg, #021212, #000000);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 255, 213, 0.3);
-    border: 1px solid #00ffd5;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
+    .case {
+      background: linear-gradient(145deg, #021212, #000000);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 0 5px rgba(162, 249, 241, 0.3);
+      border: 1px solid #a2f9f1;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
 
-  .case:hover {
-    transform: scale(1.002);
-    box-shadow: 0 0 25px #00ffd5;
-  }
+    .case:hover {
+      transform: scale(1.002);
+      box-shadow: 0 0 25px #a2f9f1;
+    }
 
-  .case a {
-    color: #00ffd5;
-    text-decoration: none;
-    font-weight: bold;
-    text-shadow: 0 0 1px #00ffd5;
-  }
+    .case a {
+      color: #a2f9f1;
+      text-decoration: none;
+      font-weight: bold;
+      text-shadow: 0 0 1px #a2f9f1;
+    }
 
-  em {
-    color: #75cbbf;
-    font-style: normal;
-    font-weight: bold;
-  }
-</style>
+    em {
+      color: #75cbbf;
+      font-style: normal;
+      font-weight: bold;
+    }
+  </style>
 </head>
-<body>
-  <h1>Neuroradiology Case Explorer</h1>
 
-  <div class="search-bar">
-    <input type="text" id="search-input" placeholder="Search by title or tags">
-    <select id="modality-filter">
-      <option value="">All Modalities</option>
-      <option value="CT">CT</option>
-      <option value="CTA">CTA</option>
-      <option value="MRI">MRI</option>
-    </select>
-    <select id="tag-filter">
-      <option value="">All Tags</option>
-    </select>
+<body class="site site-lang-en">
+  <div id="wb_root" class="root wb-layout-vertical">
+    <div class="wb_sbg"></div>
+
+    <!-- HEADER remains unchanged -->
+    <div id="wb_header_a188dd93abf3000433fb38f365731ff4" class="wb_element wb-layout-element">
+      <!-- (header content) -->
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <div id="wb_main_a188dd93abf3000433fb38f365731ff4" class="wb_element wb-layout-element">
+      <div class="wb_content wb-layout-vertical; justify-content: flex-start;">
+
+        <!-- YOUR CUSTOM APP GOES HERE -->
+	<div style="display: flex; max-width: 800px; align-items: center; margin-top: 16px;">
+  	   <img src="logo/favicon2.jpg" alt="Image" style="height: 150px; margin-left: 20px; margin-right: 10px;">
+  	   <span style="font-size: 24px; margin-right: 8px; flex: 1;">Pixels2Patterns: Neuroradiology Case Explorer</span>
+	</div>
+
+	<div style="display: flex; max-width: 400px;margin-left: 10px; margin-right: 10px;">
+         <div class="search-bar">
+          <input type="text" id="search-input" placeholder="Search by title or tags">
+          <select id="modality-filter">
+            <option value="">All Modalities</option>
+            <option value="CT">CT</option>
+            <option value="MRI">MRI</option>
+          </select>
+          <select id="tag-filter" multiple>
+            <option value="">All Tags</option>
+          </select>
+         </div>
+	</div>
+      <div style="display: flex; max-width: 800px;">	
+       <div id="case-list"></div>
+      </div>
+     </div>
+    </div>
+
+    <!-- FOOTER remains unchanged -->
+    <div id="wb_footer_a188dd93abf3000433fb38f365731ff4" class="wb_element wb-layout-element">
+      <!-- (footer content) -->
+    </div>
   </div>
 
-  <div id="case-list"></div>
+  <!-- JavaScript for Neuroradiology Filtering -->
+  <script>
+    let cases = [];
 
-<script>
-  let cases = [];
+    fetch("/cases/cases.json")
+      .then(response => response.json())
+      .then(data => {
+        cases = data;
+        populateTagFilter(cases);
+        displayCases(cases);
+      });
 
-  // Load data from cases.json
-  fetch("cases.json")
-    .then(response => response.json())
-    .then(data => {
-      cases = data;
-      populateTagFilter(cases);
-      displayCases(cases);
-    });
+    const searchInput = document.getElementById("search-input");
+    const modalityFilter = document.getElementById("modality-filter");
+    const tagFilter = document.getElementById("tag-filter");
+    const caseList = document.getElementById("case-list");
 
-  const searchInput = document.getElementById("search-input");
-  const modalityFilter = document.getElementById("modality-filter");
-  const tagFilter = document.getElementById("tag-filter");
-  const caseList = document.getElementById("case-list");
-
-  function populateTagFilter(cases) {
-    const tags = new Set();
-    cases.forEach(c => c.tags.forEach(tag => tags.add(tag)));
-    const sorted = Array.from(tags).sort();
-    for (const tag of sorted) {
-      const opt = document.createElement("option");
-      opt.value = tag;
-      opt.textContent = tag;
-      tagFilter.appendChild(opt);
+    function populateTagFilter(cases) {
+      const tags = new Set();
+      cases.forEach(c => c.tags.forEach(tag => tags.add(tag)));
+      const sorted = Array.from(tags).sort();
+      for (const tag of sorted) {
+        const opt = document.createElement("option");
+        opt.value = tag;
+        opt.textContent = tag;
+        tagFilter.appendChild(opt);
+      }
     }
-  }
 
-  function displayCases(filteredCases) {
-    caseList.innerHTML = "";
-    filteredCases.forEach(c => {
-      const div = document.createElement("div");
-      div.className = "case";
-      div.innerHTML = `
-        <strong>${c.title}</strong><br>
-        <em>Modality:</em> ${c.modality}<br>
-        <em>Tags:</em> ${c.tags.join(", ")}<br>
-        <a href="${c.link}" target="_blank">${c.link ? "View Case" : "No Link Available"}</a>
-      `;
-      caseList.appendChild(div);
-    });
-  }
+    function displayCases(filteredCases) {
+      caseList.innerHTML = "";
+      filteredCases.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "case";
+        div.innerHTML = `
+          <strong>${c.title}</strong><br>
+          <em>Modality:</em> ${c.modality}<br>
+          <em>Tags:</em> ${c.tags.join(", ")}<br>
+          <a href="${c.link}" target="_blank">${c.link ? "View Case" : "No Link Available"}</a>
+        `;
+        caseList.appendChild(div);
+      });
+    }
 
-  function filterCases() {
-    const query = searchInput.value.toLowerCase();
-    const selectedModality = modalityFilter.value;
-    const selectedTag = tagFilter.value;
+    function filterCases() {
+      const query = searchInput.value.toLowerCase();
+      const selectedModality = modalityFilter.value;
+      const selectedTag = tagFilter.value;
 
-    const result = cases.filter(c => {
-      const matchesQuery =
-        c.title.toLowerCase().includes(query) ||
-        c.tags.some(tag => tag.includes(query));
-      const matchesModality = !selectedModality || c.modality === selectedModality;
-      const matchesTag = !selectedTag || c.tags.includes(selectedTag);
-      return matchesQuery && matchesModality && matchesTag;
-    });
+      const result = cases.filter(c => {
+        const matchesQuery =
+          c.title.toLowerCase().includes(query) ||
+          c.tags.some(tag => tag.toLowerCase().includes(query));
+        const matchesModality = !selectedModality || c.modality === selectedModality;
+        const matchesTag = !selectedTag || c.tags.includes(selectedTag);
+        return matchesQuery && matchesModality && matchesTag;
+      });
 
-    displayCases(result);
-  }
+      displayCases(result);
+    }
 
-  searchInput.addEventListener("input", filterCases);
-  modalityFilter.addEventListener("change", filterCases);
-  tagFilter.addEventListener("change", filterCases);
-</script>
-</body>
-</html>
+    searchInput.addEventListener("input", filterCases);
+    modalityFilter.addEventListener("change", filterCases);
+    tagFilter.addEventListener("change", filterCases);
+  </script>
